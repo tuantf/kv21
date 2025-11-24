@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'motion/react'
+import { initial, animate, transition } from '@/libs/motion'
 import { Header } from '@/components/header'
 import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
@@ -13,9 +14,9 @@ export default function Page() {
       <Header title="Hỏi đáp PCCC&CNCH" />
       <main className="flex flex-1 flex-col gap-4 overflow-auto p-4 pt-0 md:overflow-hidden">
         <motion.section
-          initial={{ opacity: 0, y: 15, filter: 'blur(10px)' }}
-          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          transition={{ duration: 0.75, ease: 'easeInOut' }}
+          initial={initial}
+          animate={animate}
+          transition={transition}
           className="min-h-0 flex-none md:flex-1 md:basis-1/2"
         >
           <div className="bg-card flex flex-1 flex-col gap-4 rounded-lg border md:h-full md:flex-row">
@@ -98,9 +99,9 @@ export default function Page() {
           </div>
         </motion.section>
         <motion.section
-          initial={{ opacity: 0, y: 15, filter: 'blur(10px)' }}
-          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          transition={{ duration: 0.75, ease: 'easeInOut' }}
+          initial={initial}
+          animate={animate}
+          transition={transition}
           className="min-h-0 flex-none md:flex-1 md:basis-1/2"
         >
           <div className="bg-card flex h-full flex-1 flex-col gap-4 rounded-lg border md:flex-row">
