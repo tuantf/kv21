@@ -1,4 +1,4 @@
-# KV21 - Fire Safety & Rescue Management System
+# KV21 - Data overviews and Works tracker system
 
 ![License](https://img.shields.io/badge/license-GPL--3.0-blue.svg)
 ![Next.js](https://img.shields.io/badge/Next.js-16.0.3-black)
@@ -61,7 +61,7 @@ Before you begin, ensure you have the following installed:
 
    ```bash
    git clone <repository-url>
-   cd kv213
+   cd ...
    ```
 
 2. **Install dependencies**
@@ -160,62 +160,11 @@ bun start
 npm start
 ```
 
-### Linting
+## Sync
 
-Run ESLint to check for code issues:
+### Setting Up Automated Sync
 
-```bash
-npm run lint
-```
-
-## API Documentation
-
-### Sync Endpoint
-
-The sync endpoint synchronizes data from Google Sheets to InstantDB.
-
-**Endpoint**: `/api/sync`  
-**Method**: `GET`  
-**Authentication**: Bearer token
-
-#### Request
-
-```bash
-curl -X GET "https://your-domain.com/api/sync" \
-  -H "Authorization: Bearer YOUR_SYNC_TOKEN"
-```
-
-#### Response
-
-```json
-{
-  "sheets": [
-    {
-      "sheetName": "chay",
-      "success": true
-    },
-    {
-      "sheetName": "cnch",
-      "success": true
-    }
-  ],
-  "chuyenDe": {
-    "success": true
-  }
-}
-```
-
-#### Error Response
-
-```json
-{
-  "error": "Unauthorized"
-}
-```
-
-#### Setting Up Automated Sync
-
-You can set up automated synchronization using a cron service like [cron-job.org](https://cron-job.org/):
+Set up automated synchronization using a cron service like [cron-job.org](https://cron-job.org/):
 
 1. **URL**: `https://your-domain.com/api/sync`
 2. **Method**: `GET`
@@ -223,82 +172,6 @@ You can set up automated synchronization using a cron service like [cron-job.org
    - `Authorization: Bearer YOUR_SYNC_TOKEN`
 4. **Schedule**: As needed (e.g., every 15 minutes)
 
-The sync endpoint processes the following Google Sheets:
-
-- `chay` - Fire incidents
-- `cnch` - Rescue operations
-- `cvhomnay` - Today's work
-- `chitieu` - Performance indicators
-- `cvtuannay` - This week's work
-- `cvtuantoi` - Next week's work
-
-## Project Structure
-
-```
-kv213/
-├── app/                    # Next.js App Router pages
-│   ├── (overview)/        # Overview pages (dashboard, tracking, etc.)
-│   ├── (ai)/             # AI feature pages
-│   ├── (other)/          # Other feature pages
-│   └── api/              # API routes
-│       └── sync/         # Sync endpoint
-├── components/            # React components
-│   ├── ui/               # UI component library (Radix UI)
-│   └── sidebar/          # Sidebar navigation
-├── libs/                  # Utility functions and business logic
-│   ├── sync.ts           # Google Sheets synchronization logic
-│   ├── instantdb.ts      # InstantDB client configuration
-│   └── route.ts          # Route configuration
-├── hooks/                 # Custom React hooks
-├── public/                # Static assets
-└── proxy.ts              # API proxy middleware
-```
-
-## Development
-
-### Code Formatting
-
-This project uses [Prettier](https://prettier.io/) for code formatting. Format your code with:
-
-```bash
-npx prettier --write .
-```
-
-### Type Checking
-
-TypeScript is configured with strict mode. Check types with:
-
-```bash
-npx tsc --noEmit
-```
-
-### Key Development Files
-
-- `next.config.ts` - Next.js configuration
-- `tsconfig.json` - TypeScript configuration
-- `tailwind.config.*` - Tailwind CSS configuration
-- `eslint.config.mjs` - ESLint configuration
-
-## License
-
-This project is licensed under the GNU General Public License v3.0 (GPL-3.0).
-
-Copyright (C) 2024 KV21
-
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the [GNU General Public License](https://www.gnu.org/licenses/) for more details.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
 ---
 
-**Note**: This application is designed specifically for Water Company #21 (Công ty nước số 21) fire safety and rescue operations management.
+**Note**: This application is designed specifically for ĐKV 21.
