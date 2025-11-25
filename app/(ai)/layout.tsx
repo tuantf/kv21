@@ -5,7 +5,7 @@ import { AppSidebar } from '@/components/sidebar/app-sidebar'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { Toaster } from '@/components/ui/sonner'
 
-const OverviewLayout = ({ children }: { children: ReactNode }) => {
+const AILayout = ({ children }: { children: ReactNode }) => {
   return (
     <div onContextMenu={e => e.preventDefault()}>
       <div>
@@ -21,4 +21,4 @@ const OverviewLayout = ({ children }: { children: ReactNode }) => {
   )
 }
 
-export default OverviewLayout
+export default AILayout

@@ -6,6 +6,7 @@ import { Separator } from '../ui/separator'
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from '../ui/breadcrumb'
 import { NavTextLogo } from '../sidebar/nav-text-logo'
 import { useSidebar } from '../ui/sidebar'
+import { db } from '@/libs/instantdb'
 
 interface HeaderProps {
   title: string
@@ -20,15 +21,17 @@ const Header = ({ title, extraButtons }: HeaderProps) => {
       <div className="flex items-center gap-2 px-4">
         <SidebarTrigger className="hover:bg-ring/20 -ml-1" />
         <Separator orientation="vertical" className="bg-ring/80 data-[orientation=vertical]:h-4" />
-        {extraButtons && (
-          <>
-            {extraButtons}
-            <Separator
-              orientation="vertical"
-              className="bg-ring/80 data-[orientation=vertical]:h-4"
-            />
-          </>
-        )}
+        <db.SignedIn>
+          {extraButtons && (
+            <>
+              {extraButtons}
+              <Separator
+                orientation="vertical"
+                className="bg-ring/80 data-[orientation=vertical]:h-4"
+              />
+            </>
+          )}
+        </db.SignedIn>
         <Breadcrumb className="ml-1">
           <BreadcrumbList>
             <BreadcrumbItem className="hidden md:block">

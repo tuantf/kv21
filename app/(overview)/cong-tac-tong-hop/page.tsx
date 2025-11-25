@@ -11,13 +11,13 @@ import { toast } from 'sonner'
 import { Sync } from '@/app/actions'
 import { db } from '@/libs/instantdb'
 import { initial, animate, transition } from '@/libs/motion'
+import { ForceLogin } from '@/components/login/force-login'
 
 const SYNC_COOLDOWN_MS = Number(process.env.NEXT_PUBLIC_SYNC_COOLDOWN_MS || 30000) // 30 seconds
 
 export default function Page() {
   const [isSyncing, setIsSyncing] = useState(false)
   const lastSyncTimeRef = useRef<number | null>(null)
-
   const query = { tonghop: {}, tonghopketthuc: {} }
   const { data, isLoading, error } = db.useQuery(query)
 
@@ -80,14 +80,19 @@ export default function Page() {
   return (
     <>
       <Header title="Công tác tổng hợp" extraButtons={SyncButton} />
-      <main className="flex flex-col gap-4 p-4 pt-0">
-        <motion.div initial={initial} animate={animate} transition={transition}>
-          <ActiveCoordinatorTable data={data ?? {}} isLoading={isLoading} />
-        </motion.div>
-        <motion.div initial={initial} animate={animate} transition={transition}>
-          <CompletedCoordinatorTable data={data ?? {}} isLoading={isLoading} />
-        </motion.div>
-      </main>
+      <db.SignedIn>
+        <main className="flex flex-col gap-4 p-4 pt-0">
+          <motion.div initial={initial} animate={animate} transition={transition}>
+            <ActiveCoordinatorTable data={data ?? {}} isLoading={isLoading} />
+          </motion.div>
+          <motion.div initial={initial} animate={animate} transition={transition}>
+            <CompletedCoordinatorTable data={data ?? {}} isLoading={isLoading} />
+          </motion.div>
+        </main>
+      </db.SignedIn>
+      <db.SignedOut>
+        <ForceLogin />
+      </db.SignedOut>
     </>
   )
 }

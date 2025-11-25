@@ -1,25 +1,28 @@
 'use client'
-import Image from 'next/image'
-import Typewriter from '../fancy/text/typewriter'
+
+import { Droplet } from 'lucide-react'
+import { NavTextLogo } from './nav-text-logo'
 
 const NavLogo = () => {
   return (
-    <a href="/">
-      <div className="flex items-center justify-center gap-2">
-        <Image src="/water.webp" alt="Logo" width={64} height={64} className="size-8" />
-        <div className="grid flex-1 text-left text-sm leading-tight">
-          <span className="truncate font-bold">CÔNG TY NƯỚC</span>
-          <Typewriter
-            text={['SỐ 21', 'KV21', 'MÊ LINH', 'KHU VỰC SỐ 21']}
-            speed={90}
-            className="bg-linear-to-r from-sky-600 to-cyan-400 bg-clip-text font-bold text-pretty text-transparent"
-            waitTime={5000}
-            deleteSpeed={80}
-            cursorChar={'_'}
-          />
-        </div>
+    <div className="flex items-center gap-2">
+      <div className="relative size-[28px]">
+        <Droplet
+          size={28}
+          className="absolute inset-0 size-[28px] text-transparent"
+          stroke="url(#bubbles-gradient)"
+        />
+        <svg className="absolute inset-0 size-0" aria-hidden="true">
+          <defs>
+            <linearGradient id="bubbles-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#1e88e5" />
+              <stop offset="100%" stopColor="#64b5f6" />
+            </linearGradient>
+          </defs>
+        </svg>
       </div>
-    </a>
+      <NavTextLogo />
+    </div>
   )
 }
 
