@@ -4,7 +4,6 @@ import {
   UserStar,
   CalendarCheck2,
   FileUp,
-  Flame,
   Sparkle,
   Sparkles,
   FireExtinguisher,
@@ -17,7 +16,7 @@ const route = {
   user: {
     name: 'Xin chào',
     email: 'pccckv21hn@gmail.com',
-    avatar: '/guest_avatar.webp',
+    avatar: '/21.webp',
   },
   overview: [
     {
