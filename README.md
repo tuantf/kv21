@@ -1,5 +1,4 @@
 <h1 align="center">
-  <p style="color: #ff5000">21</p>
   <p>KV21</p>
 </h1>
 
@@ -20,7 +19,7 @@
 
 ### Chức năng khác
 
-- **Trải nghiệm PCCC** - Trang giới thiệu tổng quan về chương trình tuyên truyền, trải nghiệm, thực hành chữa cháy và CNCH do đơn vi tổ chức
+- **Trải nghiệm PCCC** - Trang giới thiệu tổng quan về chương trình tuyên truyền, trải nghiệm, thực hành chữa cháy và CNCH do đơn vị tổ chức
 - **Chức năng AI**:
   - Hỏi đáp PCCC&CNCH dử dụng NotebookLM
   - AI phục vụ công việc
@@ -33,7 +32,7 @@
 - **Framework**: [Next.js](https://nextjs.org/)
 - **Database**: [InstantDB](https://instantdb.com/)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **UI Components**: [Shadcn UI](https://www.radix-ui.com/)
+- **UI Components**: [Shadcn UI](https://ui.shadcn.com/)
 - **Animations**: [Motion](https://motion.dev/)
 - **Charts**: [Recharts](https://recharts.org/)
 - **Analytics**: [Umami](https://umami.is/)
