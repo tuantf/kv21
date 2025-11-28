@@ -235,7 +235,7 @@ export default function SimpleMarqueeDemo() {
         <div className="flex h-full flex-1 flex-col items-start justify-between gap-1.5">
           <div className="group flex items-center gap-2 text-sm font-medium md:text-xl">
             Đăng ký tham gia chương trình
-            <ArrowDown className="size-4 transition-transform duration-300 group-hover:translate-x-1 md:translate-y-0.5" />
+            <ArrowDown className="size-4 transition-transform duration-300 group-hover:translate-y-2 md:translate-y-0.5" />
           </div>
           <p className="text-[10.5px] md:text-sm">
             <span>
