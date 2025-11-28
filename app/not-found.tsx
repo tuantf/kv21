@@ -15,11 +15,15 @@ export default function NotFound() {
           <div className="w-60 pt-0.75">
             <Line1 width="100%" />
           </div>
-          <Link href="/" prefetch={false} className="flex gap-1 hover:text-[#ff4800]/80">
-            <div className="w-32">
-              <Line2 width="100%" className="" />
+          <Link
+            href="/"
+            prefetch={false}
+            className="hover:text-signature-orange/80 flex items-center justify-center gap-1"
+          >
+            <div className="w-30">
+              <Line2 width="100%" />
             </div>
-            <MoveLeft className="size-4" />
+            <MoveLeft className="size-4 translate-y-0.25" />
           </Link>
         </div>
       </div>
