@@ -5,13 +5,14 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Header } from '@/components/header'
 import { ButtonGroup } from '@/components/ui/button-group'
 import { Button } from '@/components/ui/button'
-import { Lesson1, Lesson2, Lesson3, Lesson4 } from './_components'
+import { Lesson1, Lesson2, Lesson3, Lesson4, Lesson5 } from './_components'
 
 const lessons = [
   { id: 1, component: Lesson1, title: 'NotebookLM' },
   { id: 2, component: Lesson2, title: 'Tạo công thức Excel/Google Sheets' },
   { id: 3, component: Lesson3, title: 'Trích xuất dữ liệu' },
   { id: 4, component: Lesson4, title: 'Kiểm tra lỗi chính tả, ngữ pháp và logic trong văn bản' },
+  { id: 5, component: Lesson5, title: 'Tạo ảnh, video phục vụ tuyên truyền' },
 ]
 
 export default function Page() {
