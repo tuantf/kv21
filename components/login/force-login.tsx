@@ -19,7 +19,7 @@ const ForceLogin = () => {
       <Button
         variant="outline"
         className="bg-signature-blue/80 hover:bg-signature-blue/90 text-white hover:text-white"
-        onClick={() => router.push('/login')}
+        onClick={() => router.push('/dang-nhap')}
       >
         Đăng nhập
       </Button>
