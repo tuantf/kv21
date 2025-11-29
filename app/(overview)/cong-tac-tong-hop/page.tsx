@@ -80,19 +80,14 @@ export default function Page() {
   return (
     <>
       <Header title="Công tác tổng hợp" extraButtons={SyncButton} />
-      <db.SignedIn>
-        <main className="flex flex-col gap-4 p-4 pt-0">
-          <motion.div initial={initial} animate={animate} transition={transition}>
-            <ActiveCoordinatorTable data={data ?? {}} isLoading={isLoading} />
-          </motion.div>
-          <motion.div initial={initial} animate={animate} transition={transition}>
-            <CompletedCoordinatorTable data={data ?? {}} isLoading={isLoading} />
-          </motion.div>
-        </main>
-      </db.SignedIn>
-      <db.SignedOut>
-        <ForceLogin />
-      </db.SignedOut>
+      <main className="flex flex-col gap-4 p-4 pt-0">
+        <motion.div initial={initial} animate={animate} transition={transition}>
+          <ActiveCoordinatorTable data={data ?? {}} isLoading={isLoading} />
+        </motion.div>
+        <motion.div initial={initial} animate={animate} transition={transition}>
+          <CompletedCoordinatorTable data={data ?? {}} isLoading={isLoading} />
+        </motion.div>
+      </main>
     </>
   )
 }

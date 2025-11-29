@@ -1,9 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { db } from '@/libs/instantdb'
 import { id } from '@instantdb/react'
-import { DataTable, ExtendedColumnDef } from '@/components/ui/data-table'
+import {
+  SortableDataTable,
+  ExtendedColumnDef,
+  createDragHandleColumn,
+} from '@/components/ui/sortable-data-table'
 import { Trash2, Plus, Ellipsis, Pencil, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -49,6 +53,7 @@ type ChuyendeRow = {
   supervisor?: string
   link?: string
   updated?: string
+  order?: number
 }
 
 export const ActiveTopicTable = ({
@@ -198,6 +203,10 @@ export const ActiveTopicTable = ({
       const sanitizedReport = sanitizeInput(formData.report)
       const sanitizedSupervisor = sanitizeInput(formData.supervisor)
 
+      // Get max order from existing data
+      const chuyendeData = (data.chuyende || []) as ChuyendeRow[]
+      const maxOrder = chuyendeData.reduce((max, item) => Math.max(max, item.order ?? 0), -1)
+
       await db.transact(
         db.tx.chuyende[id()].update({
           created: now,
@@ -207,6 +216,7 @@ export const ActiveTopicTable = ({
           report: sanitizedReport,
           supervisor: sanitizedSupervisor,
           updated: now,
+          order: maxOrder + 1,
         }),
       )
       // Clear form and errors
@@ -296,6 +306,10 @@ export const ActiveTopicTable = ({
     try {
       const now = new Date().toISOString()
 
+      // Get max order from chuyendeketthuc
+      const chuyendeketthucData = (data.chuyendeketthuc || []) as ChuyendeRow[]
+      const maxOrder = chuyendeketthucData.reduce((max, item) => Math.max(max, item.order ?? 0), -1)
+
       // Create new record in chuyendeketthuc with same data
       await db.transact(
         db.tx.chuyendeketthuc[id()].update({
@@ -307,6 +321,7 @@ export const ActiveTopicTable = ({
           supervisor: row.supervisor || '',
           progress: row.progress || '',
           updated: now,
+          order: maxOrder + 1,
         }),
       )
 
@@ -317,8 +332,30 @@ export const ActiveTopicTable = ({
     }
   }
 
+  const handleReorder = async (reorderedItems: ChuyendeRow[]) => {
+    try {
+      const updates = reorderedItems.map((item, index) =>
+        db.tx.chuyende[item.id].update({ order: index }),
+      )
+      await db.transact(updates)
+    } catch (error) {
+      console.error('Error reordering:', error)
+    }
+  }
+
+  // Sort data by order field
+  const sortedData = useMemo(() => {
+    const chuyendeData = (data.chuyende || []) as ChuyendeRow[]
+    return [...chuyendeData].sort((a, b) => {
+      const orderA = a.order ?? Number.MAX_SAFE_INTEGER
+      const orderB = b.order ?? Number.MAX_SAFE_INTEGER
+      return orderA - orderB
+    })
+  }, [data.chuyende])
+
   // Create columns with hardcoded 'chuyende' collection
-  const createColumns = (): ExtendedColumnDef<ChuyendeRow, string>[] => [
+  const createColumns = (): ExtendedColumnDef<ChuyendeRow, unknown>[] => [
+    createDragHandleColumn<ChuyendeRow>(),
     {
       accessorKey: 'name',
       header: 'Tên chuyên đề',
@@ -406,29 +443,34 @@ export const ActiveTopicTable = ({
       header: '',
       highlight: true,
       cell: ({ row }) => (
-        <div className="flex items-center justify-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-4 w-4">
-                <Ellipsis className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handleEdit(row.original)}>
-                <Pencil className="mr-2 h-4 w-4" />
-                Chỉnh sửa
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleMarkAsCompleted(row.original)}>
-                <CheckCircle2 className="mr-2 h-4 w-4" />
-                Đánh dấu đã kết thúc
-              </DropdownMenuItem>
-              <DropdownMenuItem variant="destructive" onClick={() => handleDelete(row.original.id)}>
-                <Trash2 className="mr-2 h-4 w-4" />
-                Xóa
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <db.SignedIn>
+          <div className="flex items-center justify-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-4 w-4">
+                  <Ellipsis className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleEdit(row.original)}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Chỉnh sửa
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleMarkAsCompleted(row.original)}>
+                  <CheckCircle2 className="mr-2 h-4 w-4" />
+                  Đánh dấu đã kết thúc
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => handleDelete(row.original.id)}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Xóa
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </db.SignedIn>
       ),
       enableSorting: false,
       size: 40,
@@ -443,7 +485,7 @@ export const ActiveTopicTable = ({
       <CardHeader className="flex items-center justify-center">
         <CardTitle>Các chuyên đề đang thực hiện</CardTitle>
         <div className="grow"></div>
-        <div>
+        <db.SignedIn>
           <Dialog
             open={dialogOpen}
             onOpenChange={open => {
@@ -658,14 +700,14 @@ export const ActiveTopicTable = ({
               </DialogFooter>
             </DialogContent>
           </Dialog>
-        </div>
+        </db.SignedIn>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-30 w-full" />
         ) : (
           <div className="h-full w-full overflow-y-auto rounded-lg border">
-            <DataTable columns={columns} data={data.chuyende || []} />
+            <SortableDataTable columns={columns} data={sortedData} onReorder={handleReorder} />
           </div>
         )}
       </CardContent>
@@ -677,7 +719,7 @@ export const ActiveTopicTable = ({
               Bạn có chắc chắn muốn xóa chuyên đề này không? Hành động này không thể hoàn tác.
               {deletingRowId && (
                 <span className="mt-2 block font-medium">
-                  {(data.chuyende || []).find(row => row.id === deletingRowId)?.name?.toUpperCase()}
+                  {sortedData.find(row => row.id === deletingRowId)?.name?.toUpperCase()}
                 </span>
               )}
             </AlertDialogDescription>

@@ -1,9 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { db } from '@/libs/instantdb'
 import { id } from '@instantdb/react'
-import { DataTable, ExtendedColumnDef } from '@/components/ui/data-table'
+import {
+  SortableDataTable,
+  ExtendedColumnDef,
+  createDragHandleColumn,
+} from '@/components/ui/sortable-data-table'
 import { Trash2, Plus, Ellipsis, Pencil, RotateCcw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -44,6 +48,7 @@ type TonghopRow = {
   link?: string
   supervisor?: string
   updated?: string
+  order?: number
 }
 
 export const CompletedCoordinatorTable = ({
@@ -53,7 +58,6 @@ export const CompletedCoordinatorTable = ({
   data: { tonghop?: TonghopRow[]; tonghopketthuc?: TonghopRow[] }
   isLoading: boolean
 }) => {
-
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -172,6 +176,10 @@ export const CompletedCoordinatorTable = ({
       const sanitizedLink = trimSheetsLink(sanitizeUrl(formData.link))
       const sanitizedSupervisor = sanitizeInput(formData.supervisor)
 
+      // Get max order from existing data
+      const tonghopketthucData = (data.tonghopketthuc || []) as TonghopRow[]
+      const maxOrder = tonghopketthucData.reduce((max, item) => Math.max(max, item.order ?? 0), -1)
+
       await db.transact(
         db.tx.tonghopketthuc[id()].update({
           created: now,
@@ -179,6 +187,7 @@ export const CompletedCoordinatorTable = ({
           link: sanitizedLink,
           supervisor: sanitizedSupervisor,
           updated: now,
+          order: maxOrder + 1,
         }),
       )
 
@@ -261,6 +270,10 @@ export const CompletedCoordinatorTable = ({
     try {
       const now = new Date().toISOString()
 
+      // Get max order from tonghop
+      const tonghopData = (data.tonghop || []) as TonghopRow[]
+      const maxOrder = tonghopData.reduce((max, item) => Math.max(max, item.order ?? 0), -1)
+
       // Create new record in tonghop with same data
       await db.transact(
         db.tx.tonghop[id()].update({
@@ -269,6 +282,7 @@ export const CompletedCoordinatorTable = ({
           link: row.link || '',
           supervisor: row.supervisor || '',
           updated: now,
+          order: maxOrder + 1,
         }),
       )
 
@@ -279,8 +293,30 @@ export const CompletedCoordinatorTable = ({
     }
   }
 
+  const handleReorder = async (reorderedItems: TonghopRow[]) => {
+    try {
+      const updates = reorderedItems.map((item, index) =>
+        db.tx.tonghopketthuc[item.id].update({ order: index }),
+      )
+      await db.transact(updates)
+    } catch (error) {
+      console.error('Error reordering:', error)
+    }
+  }
+
+  // Sort data by order field
+  const sortedData = useMemo(() => {
+    const tonghopketthucData = (data.tonghopketthuc || []) as TonghopRow[]
+    return [...tonghopketthucData].sort((a, b) => {
+      const orderA = a.order ?? Number.MAX_SAFE_INTEGER
+      const orderB = b.order ?? Number.MAX_SAFE_INTEGER
+      return orderA - orderB
+    })
+  }, [data.tonghopketthuc])
+
   // Create columns
-  const createColumns = (): ExtendedColumnDef<TonghopRow, string>[] => [
+  const createColumns = (): ExtendedColumnDef<TonghopRow, unknown>[] => [
+    createDragHandleColumn<TonghopRow>(),
     {
       accessorKey: 'name',
       header: 'Tên phần việc/công việc',
@@ -327,29 +363,34 @@ export const CompletedCoordinatorTable = ({
       header: '',
       highlight: true,
       cell: ({ row }) => (
-        <div className="flex items-center justify-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-4 w-4">
-                <Ellipsis className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handleEdit(row.original)}>
-                <Pencil className="mr-2 h-4 w-4" />
-                Chỉnh sửa
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleMarkAsActive(row.original)}>
-                <RotateCcw className="mr-2 h-4 w-4" />
-                Đánh dấu đang thực hiện
-              </DropdownMenuItem>
-              <DropdownMenuItem variant="destructive" onClick={() => handleDelete(row.original.id)}>
-                <Trash2 className="mr-2 h-4 w-4" />
-                Xóa
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <db.SignedIn>
+          <div className="flex items-center justify-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-4 w-4">
+                  <Ellipsis className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleEdit(row.original)}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Chỉnh sửa
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleMarkAsActive(row.original)}>
+                  <RotateCcw className="mr-2 h-4 w-4" />
+                  Đánh dấu đang thực hiện
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => handleDelete(row.original.id)}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Xóa
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </db.SignedIn>
       ),
       enableSorting: false,
       size: 40,
@@ -364,7 +405,7 @@ export const CompletedCoordinatorTable = ({
       <CardHeader className="flex items-center justify-center">
         <CardTitle>Các phần việc/công việc đã kết thúc</CardTitle>
         <div className="grow"></div>
-        <div>
+        <db.SignedIn>
           <Dialog
             open={dialogOpen}
             onOpenChange={open => {
@@ -531,14 +572,14 @@ export const CompletedCoordinatorTable = ({
               </DialogFooter>
             </DialogContent>
           </Dialog>
-        </div>
+        </db.SignedIn>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-30 w-full" />
         ) : (
           <div className="h-full w-full overflow-y-auto rounded-lg border">
-            <DataTable columns={columns} data={data.tonghopketthuc || []} />
+            <SortableDataTable columns={columns} data={sortedData} onReorder={handleReorder} />
           </div>
         )}
       </CardContent>
@@ -551,7 +592,7 @@ export const CompletedCoordinatorTable = ({
               tác.
               {deletingRowId && (
                 <span className="mt-2 block font-medium">
-                  {(data.tonghopketthuc || []).find(row => row.id === deletingRowId)?.name?.toUpperCase()}
+                  {sortedData.find(row => row.id === deletingRowId)?.name?.toUpperCase()}
                 </span>
               )}
             </AlertDialogDescription>

@@ -406,29 +406,34 @@ export const CompletedTopicTable = ({
       header: '',
       highlight: true,
       cell: ({ row }) => (
-        <div className="flex items-center justify-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-4 w-4">
-                <Ellipsis className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handleEdit(row.original)}>
-                <Pencil className="mr-2 h-4 w-4" />
-                Chỉnh sửa
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleMarkAsActive(row.original)}>
-                <RotateCcw className="mr-2 h-4 w-4" />
-                Đánh dấu đang thực hiện
-              </DropdownMenuItem>
-              <DropdownMenuItem variant="destructive" onClick={() => handleDelete(row.original.id)}>
-                <Trash2 className="mr-2 h-4 w-4" />
-                Xóa
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <db.SignedIn>
+          <div className="flex items-center justify-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-4 w-4">
+                  <Ellipsis className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleEdit(row.original)}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Chỉnh sửa
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleMarkAsActive(row.original)}>
+                  <RotateCcw className="mr-2 h-4 w-4" />
+                  Đánh dấu đang thực hiện
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => handleDelete(row.original.id)}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Xóa
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </db.SignedIn>
       ),
       enableSorting: false,
       size: 40,
@@ -443,7 +448,7 @@ export const CompletedTopicTable = ({
       <CardHeader className="flex items-center justify-center">
         <CardTitle>Các chuyên đề đã kết thúc</CardTitle>
         <div className="grow"></div>
-        <div>
+        <db.SignedIn>
           <Dialog
             open={dialogOpen}
             onOpenChange={open => {
@@ -658,7 +663,7 @@ export const CompletedTopicTable = ({
               </DialogFooter>
             </DialogContent>
           </Dialog>
-        </div>
+        </db.SignedIn>
       </CardHeader>
       <CardContent>
         {isLoading ? (
