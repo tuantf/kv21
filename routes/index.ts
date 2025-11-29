@@ -12,11 +12,11 @@ import {
   Target,
 } from 'lucide-react'
 
-const route = {
+const routes = {
   user: {
     name: 'Xin chào',
     email: 'xinchao@kv21.io.vn',
-    avatar: '/21.webp',
+    avatar: '/other/21.svg',
   },
   overview: [
     {
@@ -104,4 +104,4 @@ const route = {
   ],
 }
 
-export { route }
+export { routes }
