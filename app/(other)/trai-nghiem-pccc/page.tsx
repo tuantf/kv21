@@ -142,9 +142,9 @@ export default function SimpleMarqueeDemo() {
         transition={transition}
         className="absolute top-0 z-0 flex h-[170%] w-full flex-col items-center justify-center space-y-2 sm:h-[200%] sm:space-y-3 md:space-y-4"
         style={{
-          maskImage: 'linear-gradient(to right, transparent, black 4%, black 96%, transparent)',
+          maskImage: 'linear-gradient(to right, transparent, black 1%, black 99%, transparent)',
           WebkitMaskImage:
-            'linear-gradient(to right, transparent, black 4%, black 96%, transparent)',
+            'linear-gradient(to right, transparent, black 1%, black 99%, transparent)',
         }}
       >
         <SimpleMarquee
