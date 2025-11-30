@@ -21,11 +21,13 @@ import { Header } from '@/components/header'
 import { updateBaoCaoNgaySettings } from '@/app/actions'
 import { db } from '@/libs/instantdb'
 
+const query = { baocaongay: {} }
+
 export default function Page() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [urlInput, setUrlInput] = useState('')
   const [urlError, setUrlError] = useState('')
-  const query = { baocaongay: {} }
+
   const { data, isLoading } = db.useQuery(query)
 
   const iframeUrl = data?.baocaongay[0]?.url || null

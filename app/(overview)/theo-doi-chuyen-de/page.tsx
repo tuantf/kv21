@@ -12,13 +12,13 @@ import { Sync } from '@/app/actions'
 import { db } from '@/libs/instantdb'
 import { initial, animate, transition } from '@/libs/motion'
 
+const query = { chuyende: {}, chuyendeketthuc: {} }
 const SYNC_COOLDOWN = Number(process.env.NEXT_PUBLIC_SYNC_COOLDOWN || 30000) // 20 seconds
 
 export default function Page() {
   const [isSyncing, setIsSyncing] = useState(false)
   const lastSyncTimeRef = useRef<number | null>(null)
 
-  const query = { chuyende: {}, chuyendeketthuc: {} }
   const { data, isLoading, error } = db.useQuery(query)
 
   if (error) {
