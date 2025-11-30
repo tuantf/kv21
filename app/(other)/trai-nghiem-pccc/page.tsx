@@ -41,7 +41,7 @@ const animate = {
   filter: 'blur(0px)',
 }
 const transition = {
-  duration: 1,
+  duration: 1.5,
 }
 
 const MarqueeItem = ({ children }: { children: React.ReactNode }) => (
