@@ -16,6 +16,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight, SquareArrowOutUpRight } from 'lucide-react'
 import { getProgressColor } from '@/libs/get-progress-color'
+import { parseValue } from '@/libs/parse-value'
 
 const chartConfig = {} satisfies ChartConfig
 
@@ -49,18 +50,6 @@ const TargetChart = ({ data, isLoading }: { data: Record<string, any>[]; isLoadi
       yearProgress,
     }
   }, [])
-
-  // Helper function handles comma and dot decimal separators
-  const parseValue = (value: any): number => {
-    if (value == null || value === '') return 0
-    const str = String(value).trim()
-    if (str === '') return 0
-
-    // Replace comma with dot for decimal parsing
-    const normalized = str.replace(',', '.')
-    const parsed = parseFloat(normalized)
-    return isNaN(parsed) ? 0 : Math.round(parsed)
-  }
 
   // Simplified data transformation: group -> categories array
   const groupedData = useMemo(() => {
