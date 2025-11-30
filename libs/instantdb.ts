@@ -6,4 +6,4 @@ if (!KV21_APP_ID) {
   throw new Error('KV21_APP_ID is not set')
 }
 
-export const db = init({ appId: KV21_APP_ID })
+export const db = init({ appId: KV21_APP_ID, devtool: false })
