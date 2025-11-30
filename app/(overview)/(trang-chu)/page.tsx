@@ -11,13 +11,14 @@ import { Sync } from '@/app/actions'
 import { db } from '@/libs/instantdb'
 import { initial, animate, transition } from '@/libs/motion'
 
+const query = { sheets: {} }
+
 const SYNC_COOLDOWN = Number(process.env.NEXT_PUBLIC_SYNC_COOLDOWN || 30000)
 
 export default function Page() {
   const [isSyncing, setIsSyncing] = useState(false)
   const lastSyncTimeRef = useRef<number | null>(null)
 
-  const query = { sheets: {} }
   const { data, isLoading, error } = db.useQuery(query)
 
   if (error) {
