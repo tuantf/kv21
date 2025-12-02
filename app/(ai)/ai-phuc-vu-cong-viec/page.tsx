@@ -7,6 +7,8 @@ import { ButtonGroup } from '@/components/ui/button-group'
 import { Button } from '@/components/ui/button'
 import { Lesson1, Lesson2, Lesson3, Lesson4, Lesson5 } from './_components'
 
+const query = { lessons: {} }
+
 const lessons = [
   { id: 1, component: Lesson1, title: 'NotebookLM' },
   { id: 2, component: Lesson2, title: 'Tạo công thức Excel/Google Sheets' },

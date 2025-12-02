@@ -81,7 +81,7 @@ const Lesson1 = () => {
           <iframe
             width="560"
             height="315"
-            src="https://www.youtube.com/embed/R2wN5-N1a_o?si=RNbPKWDVb4moOy5B"
+            src="https://www.youtube.com/embed/Plb2d9i4V2w?si=example"
             title="YouTube video player"
             className="h-full w-full items-center justify-center border-none"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
