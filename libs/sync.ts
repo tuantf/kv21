@@ -14,15 +14,6 @@ function getRequiredEnv(name: string): string {
   return v
 }
 
-/**
- * Conditional logging - only log in development or when explicitly enabled
- */
-function log(message: string, ...args: any[]) {
-  if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
-    console.log(message, ...args)
-  }
-}
-
 function logError(message: string, ...args: any[]) {
   // Always log errors, but sanitize in production
   if (process.env.NODE_ENV === 'production') {
