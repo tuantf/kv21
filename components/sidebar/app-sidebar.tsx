@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import { NavHeader } from './nav-header'
 import { NavMain } from './nav-main'
+import { NavUserDefault } from './nav-user-default'
 import { NavUser } from './nav-user'
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader } from '@/components/ui/sidebar'
 import { routes } from '@/routes'
@@ -23,8 +24,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter>
         <db.SignedIn>
           <NavSecondary items={routes.helper} />
+          <NavUser />
         </db.SignedIn>
-        <NavUser user={routes.user} />
+        <db.SignedOut>
+          <NavUserDefault user={routes.user} />
+        </db.SignedOut>
       </SidebarFooter>
     </Sidebar>
   )

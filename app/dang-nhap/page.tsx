@@ -1,13 +1,14 @@
 'use client'
 
-import { LoginForm } from '@/components/login/login-form'
 import { motion } from 'motion/react'
 import { initial, animate, transition } from '@/libs/motion'
 import { Beams } from '@/components/background/beam'
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { db } from '@/libs/instantdb'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 export default function LoginPage() {
   const [sentEmail, setSentEmail] = useState('')
@@ -36,16 +37,38 @@ export default function LoginPage() {
   )
 }
 
+const EMAIL_STEP_COOLDOWN = Number(process.env.NEXT_PUBLIC_EMAIL_STEP_COOLDOWN || 10000) // Default 10 seconds
+const CODE_STEP_COOLDOWN = Number(process.env.NEXT_PUBLIC_CODE_STEP_COOLDOWN || 10000) // Default 10 seconds
+
 function EmailStep({ onSendEmail }: { onSendEmail: (email: string) => void }) {
   const [email, setEmail] = useState('')
-
+  const lastSendTimeRef = useRef<number | null>(null)
+  const router = useRouter()
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    const now = Date.now()
+    // Check rate limit
+    if (lastSendTimeRef.current !== null) {
+      const timeSinceLastSend = now - lastSendTimeRef.current
+      if (timeSinceLastSend < EMAIL_STEP_COOLDOWN) {
+        const remainingSeconds = Math.ceil((EMAIL_STEP_COOLDOWN - timeSinceLastSend) / 1000)
+        toast.warning(`Vui lòng đợi ${remainingSeconds} giây trước khi thử lại`)
+        return
+      }
+    }
+
     onSendEmail(email)
-    db.auth.sendMagicCode({ email }).catch(err => {
-      toast.error('Có lỗi xảy ra: ' + err.body?.message)
-      onSendEmail('')
-    })
+    db.auth
+      .sendMagicCode({ email })
+      .then(() => {
+        // Update last send time on success
+        lastSendTimeRef.current = Date.now()
+      })
+      .catch(err => {
+        toast.error('Có lỗi xảy ra: ' + err.body?.message)
+        onSendEmail('')
+      })
   }
 
   const handleEmailNotExisted = (e: React.FormEvent<HTMLFormElement>) => {
@@ -68,21 +91,26 @@ function EmailStep({ onSendEmail }: { onSendEmail: (email: string) => void }) {
       <p className="text-center text-gray-700 italic">
         Nhập email vào ô dưới đây, và mã xác thực sẽ được gửi đến email của bạn
       </p>
-      <input
+      <Input
         type="email"
         className="w-full rounded-md border border-gray-300 px-3 py-1"
         placeholder="email@kv21.io.vn"
         required
-        autoFocus
         value={email}
         onChange={e => setEmail(e.target.value)}
       />
-      <button
+      <Button
         type="submit"
-        className="bg-signature-blue/80 hover:bg-signature-blue/90 w-full rounded-md px-3 py-1 font-bold text-white shadow-sm hover:text-white"
+        className="bg-signature-blue/80 hover:bg-signature-blue/90 w-full text-white"
       >
         Gửi mã xác thực
-      </button>
+      </Button>
+      <div
+        className="cursor-pointer text-center text-xs text-gray-700 hover:underline"
+        onClick={() => router.push('/')}
+      >
+        Trở về trang chủ
+      </div>
     </form>
   )
 }
@@ -90,11 +118,27 @@ function EmailStep({ onSendEmail }: { onSendEmail: (email: string) => void }) {
 function CodeStep({ sentEmail }: { sentEmail: string }) {
   const router = useRouter()
   const [code, setCode] = useState('')
+  const lastSubmitTimeRef = useRef<number | null>(null)
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    const now = Date.now()
+    // Check rate limit
+    if (lastSubmitTimeRef.current !== null) {
+      const timeSinceLastSubmit = now - lastSubmitTimeRef.current
+      if (timeSinceLastSubmit < CODE_STEP_COOLDOWN) {
+        const remainingSeconds = Math.ceil((CODE_STEP_COOLDOWN - timeSinceLastSubmit) / 1000)
+        toast.warning(`Vui lòng đợi ${remainingSeconds} giây trước khi thử lại`)
+        return
+      }
+    }
+
     db.auth
       .signInWithMagicCode({ email: sentEmail, code })
       .then(() => {
+        // Update last submit time on success
+        lastSubmitTimeRef.current = Date.now()
         router.push('/')
       })
       .catch(err => {
@@ -110,21 +154,26 @@ function CodeStep({ sentEmail }: { sentEmail: string }) {
         Mã xác thực đã được gửi đến email <strong>{sentEmail}</strong>. Kiểm tra email của bạn và
         nhập mã xác thực vào ô dưới đây.
       </p>
-      <input
+      <Input
         type="text"
         className="w-full rounded-md border border-gray-300 px-3 py-1"
         placeholder="123456"
         required
-        autoFocus
         value={code}
         onChange={e => setCode(e.target.value)}
       />
-      <button
+      <Button
         type="submit"
-        className="bg-signature-blue/80 hover:bg-signature-blue/90 w-full rounded-md px-3 py-1 font-bold text-white shadow-sm hover:text-white"
+        className="bg-signature-blue/80 hover:bg-signature-blue/90 w-full text-white"
       >
         Đăng nhập
-      </button>
+      </Button>
+      <div
+        className="cursor-pointer text-center text-xs text-gray-700 hover:underline"
+        onClick={() => router.push('/')}
+      >
+        Trở về trang chủ
+      </div>
     </form>
   )
 }

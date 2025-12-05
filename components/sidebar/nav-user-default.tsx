@@ -21,13 +21,17 @@ import { db } from '@/libs/instantdb'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
-export function NavUser() {
+export function NavUserDefault({
+  user,
+}: {
+  user: {
+    name: string
+    email: string
+    avatar: string
+  }
+}) {
   const { isMobile } = useSidebar()
   const router = useRouter()
-  const { user } = db.useAuth()
-  const { data } = db.useQuery({ $users: { $: { where: { email: user?.email } } } })
-  const userName = data?.$users?.[0]?.name
-  const userAvatar = data?.$users?.[0]?.imageURL
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -38,12 +42,12 @@ export function NavUser() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-3"
             >
               <Avatar className="h-8 w-8 rounded-full">
-                <AvatarImage src={userAvatar ?? null} alt={user?.email ?? ''} />
+                <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback className="rounded-lg">21</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 -translate-y-px text-left text-sm leading-tight">
-                <span className="truncate font-medium">{userName}</span>
-                <span className="truncate text-xs">{user?.email}</span>
+                <span className="truncate font-medium">{user.name}</span>
+                <span className="truncate text-xs">{user.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -57,14 +61,14 @@ export function NavUser() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-full">
-                  <AvatarImage src={userAvatar ?? null} alt={user?.email ?? ''} />
+                  <AvatarImage src={user.avatar} alt={user.name} />
                   <AvatarFallback className="rounded-full border border-gray-200">
                     21
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{userName}</span>
-                  <span className="truncate text-xs">{user?.email}</span>
+                  <span className="truncate font-medium">{user.name}</span>
+                  <span className="truncate text-xs">{user.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
@@ -83,18 +87,12 @@ export function NavUser() {
             <db.SignedIn>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
-                <DropdownMenuItem
-                  className="hover:bg-ring/20"
-                  onClick={() => router.push('/tai-khoan')}
-                >
+                <DropdownMenuItem className="hover:bg-ring/20">
                   <UserPen />
                   Tài khoản
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="hover:bg-ring/20"
-                  onClick={() => router.push('/gioi-thieu')}
-                >
+                <DropdownMenuItem className="hover:bg-ring/20">
                   <Info />
                   Giới thiệu
                 </DropdownMenuItem>
