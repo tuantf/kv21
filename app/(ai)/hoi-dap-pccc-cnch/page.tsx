@@ -127,7 +127,7 @@ export default function Page() {
 
   return (
     <div className="bg-background flex min-h-screen flex-col md:h-screen">
-      <Header title="Hỏi đáp PCCC&CNCH" extraButtons={settingsButton} isAdmin={true} />
+      <Header title="Hỏi đáp PCCC&CNCH" extraButtons={settingsButton} />
       <main className="flex flex-1 flex-col gap-4 overflow-auto p-4 pt-0">
         {isLoading ? (
           <div className="flex h-full items-center justify-center">
