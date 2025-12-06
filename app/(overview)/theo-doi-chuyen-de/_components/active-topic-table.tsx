@@ -408,14 +408,14 @@ export const ActiveTopicTable = ({
     },
     {
       accessorKey: 'supervisor',
-      header: 'Cán bộ phụ trách',
+      header: 'CB phụ trách',
       size: 100,
       align: 'center',
       highlight: true,
     },
     {
       accessorKey: 'link',
-      header: 'Trang theo dõi',
+      header: 'Theo dõi',
       size: 100,
       align: 'center',
       highlight: false,
