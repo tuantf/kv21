@@ -1,15 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Pencil } from 'lucide-react'
 import { Header } from '@/components/header'
 import { ButtonGroup } from '@/components/ui/button-group'
 import { Button } from '@/components/ui/button'
 import { LessonViewer } from '../_components/lesson-viewer'
 import { useCourseLessons } from '../_hooks/use-lessons'
 import { Spinner } from '@/components/ui/spinner'
+import { useRouter } from 'next/navigation'
 
 export default function Page() {
+  const router = useRouter()
   const [currentIndex, setCurrentIndex] = useState(0)
   const { data, isLoading, error } = useCourseLessons('ai-phuc-vu-cong-viec')
 
@@ -39,10 +41,21 @@ export default function Page() {
 
   const { course, lessons } = data
 
+  const manageButton = (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="hover:bg-ring/20 size-7"
+      onClick={() => router.push(`/quan-ly-bai-hoc`)}
+    >
+      <Pencil className="h-4 w-4" />
+    </Button>
+  )
+
   if (lessons.length === 0) {
     return (
       <div className="bg-background flex min-h-screen flex-col md:h-screen">
-        <Header title={course.title} />
+        <Header title={course.title} extraButtons={manageButton} />
         <main className="flex flex-1 items-center justify-center">
           <p className="text-muted-foreground">Không có dữ liệu</p>
         </main>
@@ -54,7 +67,7 @@ export default function Page() {
 
   return (
     <div className="bg-background flex min-h-screen flex-col md:h-screen">
-      <Header title={course.title} />
+      <Header title={course.title} extraButtons={manageButton} />
       <main className="flex flex-1 flex-col gap-4 overflow-auto p-4 pt-0 md:overflow-hidden">
         <div className="flex items-center justify-between">
           <div className="flex gap-2">
