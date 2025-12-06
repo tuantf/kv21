@@ -1,13 +1,9 @@
 'use client'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { CalendarDays } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DataTable, ExtendedColumnDef } from '@/components/ui/data-table'
 import { useMemo } from 'react'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Button } from '@/components/ui/button'
-import { CalendarTodayWork } from './calendar'
 
 const columns: ExtendedColumnDef<Record<string, string>, unknown>[] = [
   {
@@ -81,23 +77,7 @@ const TodayWork = ({ data, isLoading }: { data: Record<string, any>[]; isLoading
   return (
     <Card className="flex h-full flex-col rounded-lg shadow-none">
       <CardHeader>
-        <div className="flex items-center gap-x-2">
-          <CardTitle>Công việc hôm nay</CardTitle>
-          <div className="grow"></div>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="hover:bg-ring/20 size-7">
-                <CalendarDays className="text-muted-foreground size-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              className="bg-card/80 w-auto border-none p-0 shadow-none backdrop-blur-sm"
-              align="end"
-            >
-              <CalendarTodayWork />
-            </PopoverContent>
-          </Popover>
-        </div>
+        <CardTitle>Công việc hôm nay</CardTitle>
         <CardDescription>{todayDate}</CardDescription>
       </CardHeader>
       <CardContent className="min-h-0 flex-1">
