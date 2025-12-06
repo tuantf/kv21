@@ -15,9 +15,10 @@ interface AskProps {
   buttonText: string
   buttonColorClass: string
   url: string
-  imageSrc: string
-  imageAlt: string
+  imageSrc?: string
+  imageAlt?: string
   isReverseLayout?: boolean
+  preview?: boolean
 }
 
 const Ask = ({
@@ -31,6 +32,7 @@ const Ask = ({
   imageSrc,
   imageAlt,
   isReverseLayout = false,
+  preview = true,
 }: AskProps) => {
   return (
     <motion.section
@@ -65,16 +67,28 @@ const Ask = ({
               <div className="mt-2 flex items-center justify-between">
                 <div className="flex"></div>
                 <div className="flex items-center gap-3">
-                  <Link href={url || ''} target="_blank" prefetch={false}>
+                  {url ? (
+                    <Link href={url} target="_blank" prefetch={false}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className={`${buttonColorClass} text-white hover:text-white`}
+                      >
+                        {buttonText}
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                  ) : (
                     <Button
                       variant="outline"
                       size="sm"
                       className={`${buttonColorClass} text-white hover:text-white`}
+                      disabled
                     >
                       {buttonText}
                       <ArrowRight className="h-4 w-4" />
                     </Button>
-                  </Link>
+                  )}
                 </div>
               </div>
             </div>
@@ -95,15 +109,17 @@ const Ask = ({
             ))}
           </div>
         </div>
-        <div className="flex-1">
-          <Image
-            src={imageSrc}
-            alt={imageAlt}
-            width={2000}
-            height={1000}
-            className="h-full w-full object-contain"
-          />
-        </div>
+        {preview && (
+          <div className="flex-1">
+            <Image
+              src={imageSrc || ''}
+              alt={imageAlt || ''}
+              width={2000}
+              height={1000}
+              className="h-full w-full object-contain"
+            />
+          </div>
+        )}
       </div>
     </motion.section>
   )

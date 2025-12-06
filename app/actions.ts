@@ -76,9 +76,14 @@ export async function updateBaoCaoNgaySettings(iframeUrl: string) {
   }
 }
 
-export async function updateHoiDapLinks(tcqcUrl: string, quytrinhUrl: string) {
+export async function updateHoiDapLinks(
+  tcqcUrl: string,
+  quytrinhUrl: string,
+  tuyenTruyenUrl: string,
+  baoCaoUrl: string,
+) {
   try {
-    if (!tcqcUrl || !quytrinhUrl) {
+    if (!tcqcUrl || !quytrinhUrl || !tuyenTruyenUrl || !baoCaoUrl) {
       return { success: false, message: 'URL không được để trống' }
     }
 
@@ -110,7 +115,12 @@ export async function updateHoiDapLinks(tcqcUrl: string, quytrinhUrl: string) {
       }
     }
 
-    await Promise.all([updateLink('tcqc', tcqcUrl), updateLink('quytrinh', quytrinhUrl)])
+    await Promise.all([
+      updateLink('tcqc', tcqcUrl),
+      updateLink('quytrinh', quytrinhUrl),
+      updateLink('tuyentruyen', tuyenTruyenUrl),
+      updateLink('baocao', baoCaoUrl),
+    ])
 
     return { success: true, message: 'Cập nhật thành công' }
   } catch (error: any) {
