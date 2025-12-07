@@ -36,7 +36,7 @@ const TargetChart = ({
         {isLoading ? (
           <Skeleton className="mx-6 h-full" />
         ) : (
-          <ChartContainer config={chartConfig} className="h-full min-h-[240px] w-full md:min-h-0">
+          <ChartContainer config={chartConfig} className="h-full min-h-[232px] w-full md:min-h-0">
             <BarChart
               accessibilityLayer
               data={data}
