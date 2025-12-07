@@ -36,27 +36,13 @@
 
 import { NextResponse } from 'next/server'
 import { syncAll } from '@/libs/sync'
-import { getSafeErrorMessage } from '@/libs/auth'
-
-function getRequiredEnv(name: string): string {
-  const v = process.env[name]
-  if (!v) {
-    // Log detailed error server-side
-    console.error(`Missing required env var: ${name}`)
-    throw new Error('Configuration error')
-  }
-  return v
-}
+import { getSafeErrorMessage, verifyBearerToken } from '@/libs/auth'
 
 export async function GET(req: Request) {
   try {
-    // Bearer auth check
-    const authHeader = (req.headers as any).get?.('authorization') || ''
-    const token = authHeader.startsWith('Bearer ') ? authHeader.slice('Bearer '.length) : ''
-    const expected = getRequiredEnv('SYNC_TOKEN')
-
-    if (!token || token !== expected) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const auth = verifyBearerToken(req)
+    if (!auth.success) {
+      return auth.response
     }
 
     // Call unified sync logic

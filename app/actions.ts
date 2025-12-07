@@ -3,6 +3,7 @@
 import { syncAll } from '@/libs/sync'
 import { init } from '@instantdb/admin'
 import { cookies } from 'next/headers'
+import { extractUrlFromIframe, sanitizeUrl, sanitizeInput } from '@/libs/sanitize'
 
 function getRequiredEnv(name: string): string {
   const v = process.env[name]
@@ -76,9 +77,12 @@ export async function updateBaoCaoNgaySettings(iframeUrl: string) {
       return { success: false, message: 'URL không được để trống' }
     }
 
+    // Extract structure from iframe if present, and sanitize
+    const cleanUrl = extractUrlFromIframe(iframeUrl)
+
     // Validate URL format
     try {
-      new URL(iframeUrl)
+      new URL(cleanUrl)
     } catch {
       return { success: false, message: 'Định dạng URL không hợp lệ' }
     }
@@ -96,7 +100,7 @@ export async function updateBaoCaoNgaySettings(iframeUrl: string) {
       const recordId = existingRecords[0].id
       await db.transact(
         db.tx.baocaongay[recordId].update({
-          url: iframeUrl.trim(),
+          url: cleanUrl,
           updated: now,
         }),
       )
@@ -105,7 +109,7 @@ export async function updateBaoCaoNgaySettings(iframeUrl: string) {
       const singletonId = 'baocaongay-settings-singleton'
       await db.transact(
         db.tx.baocaongay[singletonId].update({
-          url: iframeUrl.trim(),
+          url: cleanUrl,
           updated: now,
         }),
       )
@@ -138,6 +142,11 @@ export async function updateHoiDapLinks(
       return { success: false, message: 'URL không được để trống' }
     }
 
+    const cleanTcqc = sanitizeUrl(tcqcUrl)
+    const cleanQuytrinh = sanitizeUrl(quytrinhUrl)
+    const cleanTuyenTruyen = sanitizeUrl(tuyenTruyenUrl)
+    const cleanBaoCao = sanitizeUrl(baoCaoUrl)
+
     const now = new Date().toISOString()
 
     // Helper to update or create a link record
@@ -150,7 +159,7 @@ export async function updateHoiDapLinks(
         const recordId = records[0].id
         await db.transact(
           db.tx.hoidap[recordId].update({
-            link: url.trim(),
+            link: url,
             updated: now,
           }),
         )
@@ -159,7 +168,7 @@ export async function updateHoiDapLinks(
         await db.transact(
           db.tx.hoidap[id].update({
             name,
-            link: url.trim(),
+            link: url,
             updated: now,
           }),
         )
@@ -167,10 +176,10 @@ export async function updateHoiDapLinks(
     }
 
     await Promise.all([
-      updateLink('tcqc', tcqcUrl),
-      updateLink('quytrinh', quytrinhUrl),
-      updateLink('tuyentruyen', tuyenTruyenUrl),
-      updateLink('baocao', baoCaoUrl),
+      updateLink('tcqc', cleanTcqc),
+      updateLink('quytrinh', cleanQuytrinh),
+      updateLink('tuyentruyen', cleanTuyenTruyen),
+      updateLink('baocao', cleanBaoCao),
     ])
 
     return { success: true, message: 'Cập nhật thành công' }
@@ -212,12 +221,20 @@ export async function createLesson(collection: LessonCollection, lessonData: Les
       return { success: false, message: 'Tiêu đề và URL video không được để trống' }
     }
 
+    const cleanTitle = sanitizeInput(lessonData.title)
+    const cleanVideoUrl = sanitizeUrl(lessonData.videoUrl)
+    
+    // Note: We're not deeply sanitizing sections content here to avoid breaking HTML content.
+    // Ideally rich text content should be sanitized with a robust HTML sanitizer on input or render.
+
     const id = crypto.randomUUID()
     const now = Date.now()
 
     await db.transact(
       db.tx[collection][id].update({
         ...lessonData,
+        title: cleanTitle,
+        videoUrl: cleanVideoUrl,
         created: now,
         updated: now,
       }),
@@ -249,11 +266,16 @@ export async function updateLesson(
       return { success: false, message: 'Tiêu đề và URL video không được để trống' }
     }
 
+    const cleanTitle = sanitizeInput(lessonData.title)
+    const cleanVideoUrl = sanitizeUrl(lessonData.videoUrl)
+
     const now = Date.now()
 
     await db.transact(
       db.tx[collection][lessonId].update({
         ...lessonData,
+        title: cleanTitle,
+        videoUrl: cleanVideoUrl,
         updated: now,
       }),
     )

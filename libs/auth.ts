@@ -39,8 +39,7 @@ export function getSafeErrorMessage(error: any, defaultMessage: string = 'An err
  * @returns Object with success status and error response if failed
  */
 export function verifyBearerToken(
-  req: Request,
-  tokenType: 'CLIENT' | 'SYNC' = 'CLIENT'
+  req: Request
 ): { success: true } | { success: false; response: NextResponse } {
   const authHeader = req.headers.get('authorization') || ''
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice('Bearer '.length) : ''
@@ -52,8 +51,7 @@ export function verifyBearerToken(
     }
   }
   
-  const expectedToken =
-    tokenType === 'CLIENT' ? getRequiredEnv('CLIENT_SYNC_TOKEN') : getRequiredEnv('SYNC_TOKEN')
+  const expectedToken = getRequiredEnv('SYNC_TOKEN')
   
   if (token !== expectedToken) {
     return {
