@@ -7,7 +7,7 @@ import { RotateCw } from 'lucide-react'
 import { toast } from 'sonner'
 import { useState, useRef } from 'react'
 import { motion } from 'motion/react'
-import { Sync } from '@/app/actions'
+import { syncData } from '@/app/actions'
 import { db } from '@/libs/instantdb'
 import { initial, animate, transition } from '@/libs/motion'
 
@@ -43,7 +43,7 @@ export default function Page() {
     toast.loading('Đang đồng bộ dữ liệu...')
 
     try {
-      const result = await Sync()
+      const result = await syncData()
 
       if (result.success) {
         // Wait a moment for the database to be updated

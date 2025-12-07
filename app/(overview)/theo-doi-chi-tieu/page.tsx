@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import { useState, useRef, useMemo } from 'react'
 import { db } from '@/libs/instantdb'
-import { Sync } from '@/app/actions'
+import { syncData } from '@/app/actions'
 import { RotateCw } from 'lucide-react'
 import { TargetChart } from './_components/target-chart'
 import { parseValue } from '@/libs/parse-value'
@@ -52,7 +52,7 @@ export default function Page() {
     toast.loading('Đang đồng bộ dữ liệu...')
 
     try {
-      const result = await Sync()
+      const result = await syncData()
 
       if (result.success) {
         // Wait a moment for the database to be updated

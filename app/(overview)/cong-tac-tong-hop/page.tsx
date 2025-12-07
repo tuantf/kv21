@@ -8,7 +8,7 @@ import { Header } from '@/components/header'
 import { ActiveCoordinatorTable } from './_components/active-coordinator-table'
 import { CompletedCoordinatorTable } from './_components/completed-coordinator-table'
 import { toast } from 'sonner'
-import { Sync } from '@/app/actions'
+import { syncData } from '@/app/actions'
 import { db } from '@/libs/instantdb'
 import { initial, animate, transition } from '@/libs/motion'
 
@@ -41,7 +41,7 @@ export default function Page() {
     toast.loading('Đang đồng bộ dữ liệu...')
 
     try {
-      const result = await Sync()
+      const result = await syncData()
 
       if (result.success) {
         // Wait a moment for the database to be updated
