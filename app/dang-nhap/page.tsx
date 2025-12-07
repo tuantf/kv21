@@ -14,6 +14,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp
 import { REGEXP_ONLY_DIGITS } from 'input-otp'
 import { Card, CardContent } from '@/components/ui/card'
 import { NavCustomLogo } from '@/components/sidebar/nav-logo'
+import { Spinner } from '@/components/ui/spinner'
 
 export default function LoginPage() {
   const [sentEmail, setSentEmail] = useState('')
@@ -44,33 +45,13 @@ export default function LoginPage() {
 
 const EMAIL_STEP_COOLDOWN = 10000
 const CODE_STEP_COOLDOWN = 10000
-const EMAIL_QUERY_DEBOUNCE = 500 // Debounce email query by 500ms
 
 function EmailStep({ onSendEmail }: { onSendEmail: (email: string) => void }) {
   const [email, setEmail] = useState('')
-  const [debouncedEmail, setDebouncedEmail] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const lastSendTimeRef = useRef<number | null>(null)
   const router = useRouter()
 
-  // Debounce email query to prevent too many database queries
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedEmail(email)
-    }, EMAIL_QUERY_DEBOUNCE)
-
-    return () => clearTimeout(timer)
-  }, [email])
-
-  // Only query database with debounced email
-  const { data } = db.useQuery(
-    debouncedEmail ? { $users: { $: { where: { email: debouncedEmail } } } } : null,
-  )
-  const isEmailExisted = useMemo(
-    () => data?.$users?.length && data.$users.length > 0,
-    [data?.$users?.length],
-  )
-
-  // Unified rate limit check function
   const checkRateLimit = (): boolean => {
     if (lastSendTimeRef.current !== null) {
       const now = Date.now()
@@ -84,40 +65,25 @@ function EmailStep({ onSendEmail }: { onSendEmail: (email: string) => void }) {
     return true
   }
 
-  // Set rate limit on error
-  const setRateLimit = () => {
-    lastSendTimeRef.current = Date.now()
-  }
-
-  // Clear rate limit on success
-  const clearRateLimit = () => {
-    lastSendTimeRef.current = null
-  }
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     if (!checkRateLimit()) return
 
-    // Check if email exists before sending magic code
-    if (!isEmailExisted) {
-      setRateLimit()
-      toast.error(
-        `Người dùng với email ${email} không tồn tại, vui lòng liên hệ người quản lý phần mềm để được hỗ trợ`,
-      )
-      return
-    }
+    setIsLoading(true)
 
-    onSendEmail(email)
     db.auth
       .sendMagicCode({ email })
       .then(() => {
-        clearRateLimit()
+        lastSendTimeRef.current = Date.now()
+        onSendEmail(email)
       })
       .catch(err => {
-        setRateLimit()
-        toast.error('Có lỗi xảy ra: ' + err.body?.message)
-        onSendEmail('')
+        lastSendTimeRef.current = Date.now()
+        toast.error('Email không tồn tại, vui lòng liên hệ người quản lý phần mềm để được hỗ trợ')
+      })
+      .finally(() => {
+        setIsLoading(false)
       })
   }
 
@@ -134,12 +100,14 @@ function EmailStep({ onSendEmail }: { onSendEmail: (email: string) => void }) {
         required
         value={email}
         onChange={e => setEmail(e.target.value)}
+        disabled={isLoading}
       />
       <Button
         type="submit"
         className="bg-signature-blue/80 hover:bg-signature-blue/90 w-full text-white"
+        disabled={isLoading}
       >
-        Gửi mã xác thực 🎉
+        {isLoading ? <Spinner /> : 'Gửi mã xác thực'}
       </Button>
       <div
         className="text-muted-foreground cursor-pointer text-center text-sm hover:underline"
@@ -154,6 +122,7 @@ function EmailStep({ onSendEmail }: { onSendEmail: (email: string) => void }) {
 function CodeStep({ sentEmail }: { sentEmail: string }) {
   const router = useRouter()
   const [code, setCode] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const lastSubmitTimeRef = useRef<number | null>(null)
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -170,6 +139,8 @@ function CodeStep({ sentEmail }: { sentEmail: string }) {
       }
     }
 
+    setIsLoading(true)
+
     db.auth
       .signInWithMagicCode({ email: sentEmail, code })
       .then(async result => {
@@ -181,8 +152,10 @@ function CodeStep({ sentEmail }: { sentEmail: string }) {
       .catch(err => {
         // Set rate limit on error to prevent rapid retries
         lastSubmitTimeRef.current = Date.now()
-        setCode('')
         toast.error('Mã xác thực không đúng, vui lòng thử lại')
+      })
+      .finally(() => {
+        setIsLoading(false)
       })
   }
 
@@ -200,6 +173,7 @@ function CodeStep({ sentEmail }: { sentEmail: string }) {
         value={code}
         onChange={value => setCode(value)}
         maxLength={6}
+        disabled={isLoading}
       >
         <InputOTPGroup>
           <InputOTPSlot index={0} className="text-lg font-medium" />
@@ -213,8 +187,9 @@ function CodeStep({ sentEmail }: { sentEmail: string }) {
       <Button
         type="submit"
         className="bg-signature-blue/80 hover:bg-signature-blue/90 w-full text-white"
+        disabled={isLoading}
       >
-        Đăng nhập
+        {isLoading ? <Spinner /> : 'Đăng nhập'}
       </Button>
       <div
         className="text-muted-foreground cursor-pointer text-center text-sm hover:underline"
