@@ -53,21 +53,21 @@ export function transformData(json: string): Record<string, any>[] {
   const parsed = JSON.parse(jsonString)
   // 3. Extract schema and rows
   const cols = parsed.table.cols.map((col: any) => col.label)
-  
+
   // Common Google Sheets error values to filter out
   const SHEET_ERRORS = ['#N/A', '#REF!', '#VALUE!', '#DIV/0!', '#NAME?', '#NULL!', '#NUM!']
-  
+
   const rows = parsed.table.rows.map((r: any) =>
     r.c.map((c: any) => {
       if (!c) return null
       // Prefer formatted value if it exists and is not empty
       const value = c.f !== undefined && c.f !== null && c.f !== '' ? c.f : c.v
-      
+
       // Filter out Google Sheets error values
       if (typeof value === 'string' && SHEET_ERRORS.includes(value)) {
         return null
       }
-      
+
       return value
     }),
   )
@@ -304,7 +304,7 @@ async function fetchProgress(
  */
 async function syncRecordProgress(
   record: { id: string; link?: string; name?: string },
-  collection: 'chuyende' | 'chuyendeketthuc',
+  collection: 'chuyende',
 ): Promise<{ id: string; success: boolean; progress: number | null; error?: string }> {
   if (!record.link) {
     return {
@@ -403,7 +403,7 @@ export async function syncChuyenDeProgress() {
     }>[] = []
     for (let i = 0; i < allRecords.length; i += MAX_CONCURRENT_REQUESTS) {
       const batch = allRecords.slice(i, i + MAX_CONCURRENT_REQUESTS)
-      const batchPromises = batch.map(record => syncRecordProgress(record, record.collection))
+      const batchPromises = batch.map(record => syncRecordProgress(record, 'chuyende'))
       const batchResults = await Promise.allSettled(batchPromises)
       allResults.push(...batchResults)
     }
