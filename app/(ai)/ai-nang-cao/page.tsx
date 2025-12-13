@@ -69,8 +69,8 @@ export default function Page() {
       <Header title={course.title} extraButtons={manageButton} />
       <main className="flex flex-1 flex-col gap-4 overflow-auto p-4 pt-0 md:overflow-hidden">
         <div className="flex items-center justify-between">
-          <div className="flex gap-2">
-            <ButtonGroup>
+          <div className="flex flex-1 gap-2">
+            <ButtonGroup className="w-full md:w-fit">
               <Button
                 variant="outline"
                 size="sm"
@@ -83,7 +83,7 @@ export default function Page() {
               <Button
                 variant="outline"
                 size="sm"
-                className="hover:text-signature-gray/80 w-16"
+                className="hover:text-signature-gray/80 grow md:w-16"
                 disabled
               >
                 {currentIndex + 1}/{lessons.length}

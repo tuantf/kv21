@@ -152,7 +152,7 @@ export default function Page() {
                   'Nhà xưởng sản xuất bao bì carton, diện tích 980m2 có phải trang bị hệ thống chữa cháy tự động không, quy định chi tiết như thế nào ?',
                 ]}
                 buttonText="Đi đến NotebookLM"
-                buttonColorClass="bg-signature-orange/80 hover:bg-signature-orange/95"
+                buttonColorClass="bg-signature-orange/80! hover:bg-signature-orange/95!"
                 url={TCQCUrl || ''}
                 imageSrc="/ai/ai_screen_1.avif"
                 imageAlt="Giao diện hỏi đáp quy chuẩn PCCC"
@@ -170,7 +170,7 @@ export default function Page() {
                   'Quy trình xác minh, giải quyết vụ cháy khi có cháy xảy ra ?',
                 ]}
                 buttonText="Đi đến NotebookLM"
-                buttonColorClass="bg-signature-blue/80 hover:bg-signature-blue/95"
+                buttonColorClass="bg-signature-blue/80! hover:bg-signature-blue/95!"
                 url={quyTrinhUrl || ''}
                 imageSrc="/ai/ai_screen_2.avif"
                 imageAlt="Giao diện hỏi đáp quy trình công tác"
@@ -186,7 +186,7 @@ export default function Page() {
                   'Tạo tin bài tuyên truyền về nội dung: Thực tập phương án chữa cháy tại khu dân cư thôn A ...',
                 ]}
                 buttonText="Đi đến NotebookLM"
-                buttonColorClass="bg-signature-orange/80 hover:bg-signature-orange/95"
+                buttonColorClass="bg-signature-orange/80! hover:bg-signature-orange/95!"
                 url={tuyenTruyenUrl || ''}
                 preview={false}
               />
@@ -199,7 +199,7 @@ export default function Page() {
                   'Đề xuất các giải pháp để khắc phục khó khăn, vướng mắc ...',
                 ]}
                 buttonText="Đi đến NotebookLM"
-                buttonColorClass="bg-signature-blue/80 hover:bg-signature-blue/95"
+                buttonColorClass="bg-signature-blue/80! hover:bg-signature-blue/95!"
                 url={baoCaoUrl || ''}
                 preview={false}
               />
