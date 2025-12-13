@@ -21,6 +21,7 @@ import { db } from '@/libs/instantdb'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { cleanCookies } from '@/app/actions'
+import { ThemeToggle } from '@/components/sidebar/theme-toggle'
 
 export function NavUser() {
   const { isMobile } = useSidebar()
@@ -90,6 +91,13 @@ export function NavUser() {
                 >
                   <UserPen />
                   Tài khoản
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="hover:bg-ring/20 focus:bg-transparent"
+                  onSelect={e => e.preventDefault()}
+                >
+                  <ThemeToggle />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem

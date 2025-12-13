@@ -20,6 +20,7 @@ import {
 import { db } from '@/libs/instantdb'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { ThemeToggle } from '@/components/sidebar/theme-toggle'
 
 export function NavUserDefault({
   user,
@@ -76,6 +77,13 @@ export function NavUserDefault({
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem
+                  className="hover:bg-ring/20 focus:bg-transparent"
+                  onSelect={e => e.preventDefault()}
+                >
+                  <ThemeToggle />
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
                   className="hover:bg-ring/20"
                   onClick={() => router.push('/dang-nhap')}
                 >
@@ -90,6 +98,13 @@ export function NavUserDefault({
                 <DropdownMenuItem className="hover:bg-ring/20">
                   <UserPen />
                   Tài khoản
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="hover:bg-ring/20 focus:bg-transparent"
+                  onSelect={e => e.preventDefault()}
+                >
+                  <ThemeToggle />
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="hover:bg-ring/20">
