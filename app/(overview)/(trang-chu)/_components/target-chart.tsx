@@ -171,7 +171,7 @@ const TargetChart = ({ data, isLoading }: { data: Record<string, any>[]; isLoadi
                   }}
                   layout="vertical"
                 >
-                  <CartesianGrid horizontal={false} stroke="#e6e6e6" />
+                  <CartesianGrid horizontal={false} stroke="var(--chart-stroke)" />
                   <XAxis
                     type="number"
                     tickLine={false}

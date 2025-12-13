@@ -140,7 +140,7 @@ const IncidentChartBar = ({
                 bottom: 2,
               }}
             >
-              <CartesianGrid vertical={false} stroke="#e6e6e6" />
+              <CartesianGrid vertical={false} stroke="var(--chart-stroke)" />
               <XAxis
                 dataKey="Tháng"
                 tickLine={false}

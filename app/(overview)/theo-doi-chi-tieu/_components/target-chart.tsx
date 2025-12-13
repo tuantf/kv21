@@ -2,9 +2,15 @@
 
 import { XAxis, YAxis, CartesianGrid, Bar, BarChart, Cell, LabelList } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ChartConfig, ChartContainer } from '@/components/ui/chart'
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart'
 import { Skeleton } from '@/components/ui/skeleton'
-import { getProgressColor } from '@/libs/get-progress-color'
+import { getProgressColor, getProgressColorClass } from '@/libs/get-progress-color'
+import { cn } from '@/libs/utils'
 
 const chartConfig = {} satisfies ChartConfig
 const ticks = [0, 25, 50, 75, 100]
@@ -17,7 +23,7 @@ const TargetChart = ({
   textAnchor,
 }: {
   label: string
-  data: Array<{ category: string; value: number }>
+  data: Array<{ category: string; value: number; note?: string }>
   isLoading: boolean
   labelAngle?: number
   textAnchor?: 'start' | 'end' | 'middle'
@@ -47,7 +53,34 @@ const TargetChart = ({
                 bottom: 32,
               }}
             >
-              <CartesianGrid vertical={false} stroke="#e6e6e6" />
+              <CartesianGrid vertical={false} stroke="var(--chart-stroke)" />
+              <ChartTooltip
+                cursor={false}
+                content={
+                  <ChartTooltipContent
+                    labelFormatter={value => value}
+                    formatter={(value, name, item) => {
+                      // Display the note if it exists
+                      const note = item.payload.note
+                      return (
+                        <div className="flex w-full justify-between gap-2">
+                          <div className="items-center">
+                            <span
+                              className={cn(
+                                'font-semibold',
+                                getProgressColorClass(Number(value), 'backward'),
+                              )}
+                            >
+                              {value}%
+                            </span>
+                          </div>
+                          {note && <div className="text-foreground/80">{note}</div>}
+                        </div>
+                      )
+                    }}
+                  />
+                }
+              />
               <XAxis
                 dataKey="category"
                 type="category"
@@ -76,6 +109,7 @@ const TargetChart = ({
                   <Cell
                     key={`cell-${index}`}
                     fill={`${getProgressColor(entry.value, 'backward')}`}
+                    className="cursor-pointer"
                   />
                 ))}
                 <LabelList
