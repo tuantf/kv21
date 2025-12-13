@@ -266,13 +266,14 @@ function convertProgressToNumber(progress: string | null): number | null {
 }
 
 /**
- * Fetches progress value from Google Sheets "data" sheet
+ * Fetches progress value from Google Sheets sheet
  */
 async function fetchProgress(
   sheetId: string,
+  sheetName: string = 'data',
 ): Promise<{ success: boolean; progress: string | null; error?: string }> {
   try {
-    const url = getSheetDataUrl(sheetId, 'data')
+    const url = getSheetDataUrl(sheetId, sheetName)
     const res = await fetch(url, { cache: 'no-store' })
 
     if (!res.ok) {
@@ -302,16 +303,18 @@ async function fetchProgress(
 /**
  * Syncs progress for a single record
  */
-async function syncRecordProgress(
-  record: { id: string; link?: string; name?: string },
-  collection: 'chuyende',
-): Promise<{ id: string; success: boolean; progress: number | null; error?: string }> {
+async function syncRecordProgress(record: {
+  id: string
+  link?: string
+  name?: string
+  progresssource?: string
+}): Promise<{ id: string; success: boolean; progress: number | null; error?: string }> {
   if (!record.link) {
     return {
       id: record.id,
-      success: false,
+      success: true,
       progress: null,
-      error: 'No link provided',
+      error: undefined,
     }
   }
 
@@ -319,14 +322,26 @@ async function syncRecordProgress(
   if (!sheetId) {
     return {
       id: record.id,
-      success: false,
+      success: true,
       progress: null,
-      error: 'Invalid Google Sheets link',
+      error: undefined,
     }
   }
 
-  const fetchResult = await fetchProgress(sheetId)
+  const fetchResult = await fetchProgress(sheetId, record.progresssource)
   if (!fetchResult.success || fetchResult.progress === null) {
+    if (
+      fetchResult.error?.includes('Failed to fetch from Google Sheets: 400') ||
+      fetchResult.error?.includes('Failed to fetch from Google Sheets: 404')
+    ) {
+      return {
+        id: record.id,
+        success: true,
+        progress: null,
+        error: undefined,
+      }
+    }
+
     return {
       id: record.id,
       success: false,
@@ -340,16 +355,16 @@ async function syncRecordProgress(
   if (progressNumber === null) {
     return {
       id: record.id,
-      success: false,
+      success: true,
       progress: null,
-      error: `Invalid progress value: "${fetchResult.progress}" cannot be converted to a number`,
+      error: undefined,
     }
   }
 
   // Update database
   try {
     await db.transact(
-      db.tx[collection][record.id].update({
+      db.tx.chuyende[record.id].update({
         progress: progressNumber,
       }),
     )
@@ -371,28 +386,26 @@ async function syncRecordProgress(
 
 export async function syncChuyenDeProgress() {
   try {
-    // Fetch both collections in parallel
-    const [chuyendeResult, chuyendeketthucResult] = await Promise.all([
-      db.query({ chuyende: {} }),
-      db.query({ chuyendeketthuc: {} }),
-    ])
+    // Fetch only chuyende records with non-null progresssource
+    const chuyendeResult = await db.query({
+      chuyende: {
+        $: {
+          where: {
+            progresssource: { $isNull: false },
+          },
+        },
+      },
+    })
 
     const chuyendeRecords = (chuyendeResult?.chuyende || []) as Array<{
       id: string
       link?: string
       name?: string
-    }>
-    const chuyendeketthucRecords = (chuyendeketthucResult?.chuyendeketthuc || []) as Array<{
-      id: string
-      link?: string
-      name?: string
+      progresssource?: string
     }>
 
     // Prepare all records for parallel processing
-    const allRecords = [
-      ...chuyendeRecords.map(r => ({ ...r, collection: 'chuyende' as const })),
-      ...chuyendeketthucRecords.map(r => ({ ...r, collection: 'chuyendeketthuc' as const })),
-    ]
+    const allRecords = chuyendeRecords
 
     // Process all records in batches with concurrency limit
     const allResults: PromiseSettledResult<{
@@ -403,7 +416,7 @@ export async function syncChuyenDeProgress() {
     }>[] = []
     for (let i = 0; i < allRecords.length; i += MAX_CONCURRENT_REQUESTS) {
       const batch = allRecords.slice(i, i + MAX_CONCURRENT_REQUESTS)
-      const batchPromises = batch.map(record => syncRecordProgress(record, 'chuyende'))
+      const batchPromises = batch.map(record => syncRecordProgress(record))
       const batchResults = await Promise.allSettled(batchPromises)
       allResults.push(...batchResults)
     }
@@ -428,12 +441,23 @@ export async function syncChuyenDeProgress() {
     const succeeded = recordResults.filter(r => r.success)
     const failed = recordResults.filter(r => !r.success)
 
+    const criticalFailures = failed.filter(r => {
+      const error = r.error || ''
+      const isAcceptableFailure =
+        error.includes('No link provided') ||
+        error.includes('Invalid Google Sheets link') ||
+        error.includes('Failed to fetch from Google Sheets: 400') ||
+        error.includes('Failed to fetch from Google Sheets: 404')
+      return !isAcceptableFailure
+    })
+
     return {
-      success: failed.length === 0,
+      success: criticalFailures.length === 0,
       summary: {
         total: recordResults.length,
         succeeded: succeeded.length,
         failed: failed.length,
+        skipped: failed.length - criticalFailures.length,
       },
     }
   } catch (err: any) {

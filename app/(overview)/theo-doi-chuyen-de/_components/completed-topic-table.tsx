@@ -54,6 +54,7 @@ type ChuyendeRow = {
   link?: string
   updated?: string
   order?: number
+  progresssource?: string
 }
 
 export const CompletedTopicTable = ({
@@ -75,14 +76,15 @@ export const CompletedTopicTable = ({
     link: '',
     report: '',
     supervisor: '',
+    progresssource: '',
   })
 
   const [errors, setErrors] = useState({
     name: '',
-    doc: '',
     link: '',
     report: '',
     supervisor: '',
+    progresssource: '',
   })
 
   const clearForm = () => {
@@ -92,13 +94,14 @@ export const CompletedTopicTable = ({
       link: '',
       report: '',
       supervisor: '',
+      progresssource: '',
     })
     setErrors({
       name: '',
-      doc: '',
       link: '',
       report: '',
       supervisor: '',
+      progresssource: '',
     })
   }
 
@@ -143,21 +146,16 @@ export const CompletedTopicTable = ({
   const validateForm = () => {
     const newErrors = {
       name: '',
-      doc: '',
       link: '',
       report: '',
       supervisor: '',
+      progresssource: '',
     }
 
     let hasError = false
 
     if (!formData.name.trim()) {
       newErrors.name = 'Trường này không được để trống'
-      hasError = true
-    }
-
-    if (!formData.doc.trim()) {
-      newErrors.doc = 'Trường này không được để trống'
       hasError = true
     }
 
@@ -202,6 +200,7 @@ export const CompletedTopicTable = ({
       const sanitizedLink = trimSheetsLink(sanitizeUrl(formData.link))
       const sanitizedReport = sanitizeInput(formData.report)
       const sanitizedSupervisor = sanitizeInput(formData.supervisor)
+      const sanitizedProgresssource = sanitizeInput(formData.progresssource)
 
       // Get max order from existing data
       const chuyendeketthucData = (data.chuyendeketthuc || []) as ChuyendeRow[]
@@ -215,6 +214,7 @@ export const CompletedTopicTable = ({
           link: sanitizedLink,
           report: sanitizedReport,
           supervisor: sanitizedSupervisor,
+          progresssource: sanitizedProgresssource,
           updated: now,
           order: maxOrder + 1,
         }),
@@ -236,13 +236,14 @@ export const CompletedTopicTable = ({
       link: row.link || '',
       report: row.report || '',
       supervisor: row.supervisor || '',
+      progresssource: row.progresssource || '',
     })
     setErrors({
       name: '',
-      doc: '',
       link: '',
       report: '',
       supervisor: '',
+      progresssource: '',
     })
     setEditDialogOpen(true)
   }
@@ -264,6 +265,7 @@ export const CompletedTopicTable = ({
       const sanitizedLink = trimSheetsLink(sanitizeUrl(formData.link))
       const sanitizedReport = sanitizeInput(formData.report)
       const sanitizedSupervisor = sanitizeInput(formData.supervisor)
+      const sanitizedProgresssource = sanitizeInput(formData.progresssource)
 
       await db.transact(
         db.tx.chuyendeketthuc[editingRowId].update({
@@ -272,6 +274,7 @@ export const CompletedTopicTable = ({
           link: sanitizedLink,
           report: sanitizedReport,
           supervisor: sanitizedSupervisor,
+          progresssource: sanitizedProgresssource,
           updated: now,
         }),
       )
@@ -321,6 +324,7 @@ export const CompletedTopicTable = ({
           report: row.report || '',
           supervisor: row.supervisor || '',
           progress: row.progress || '',
+          progresssource: row.progresssource || '',
           updated: now,
           order: maxOrder + 1,
         }),
@@ -530,11 +534,7 @@ export const CompletedTopicTable = ({
                     value={formData.doc}
                     onChange={e => {
                       setFormData({ ...formData, doc: e.target.value })
-                      if (errors.doc) {
-                        setErrors({ ...errors, doc: '' })
-                      }
                     }}
-                    aria-invalid={!!errors.doc}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -578,6 +578,21 @@ export const CompletedTopicTable = ({
                       }
                     }}
                     aria-invalid={!!errors.supervisor}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="progresssource">Tiến độ (Tên sheet chứa tiến độ)</Label>
+                  <Input
+                    id="progresssource"
+                    value={formData.progresssource}
+                    onChange={e => {
+                      setFormData({ ...formData, progresssource: e.target.value })
+                      if (errors.progresssource) {
+                        setErrors({ ...errors, progresssource: '' })
+                      }
+                    }}
+                    placeholder="Ví dụ: progress"
+                    aria-invalid={!!errors.progresssource}
                   />
                 </div>
               </div>
@@ -630,11 +645,7 @@ export const CompletedTopicTable = ({
                     value={formData.doc}
                     onChange={e => {
                       setFormData({ ...formData, doc: e.target.value })
-                      if (errors.doc) {
-                        setErrors({ ...errors, doc: '' })
-                      }
                     }}
-                    aria-invalid={!!errors.doc}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -678,6 +689,21 @@ export const CompletedTopicTable = ({
                       }
                     }}
                     aria-invalid={!!errors.supervisor}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="edit-progresssource">Nguồn tiến độ (tên sheet)</Label>
+                  <Input
+                    id="edit-progresssource"
+                    value={formData.progresssource}
+                    onChange={e => {
+                      setFormData({ ...formData, progresssource: e.target.value })
+                      if (errors.progresssource) {
+                        setErrors({ ...errors, progresssource: '' })
+                      }
+                    }}
+                    placeholder="Ví dụ: data"
+                    aria-invalid={!!errors.progresssource}
                   />
                 </div>
               </div>
