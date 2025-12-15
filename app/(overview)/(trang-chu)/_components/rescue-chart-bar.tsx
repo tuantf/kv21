@@ -39,7 +39,7 @@ const RescueChartBar = ({
   data: Record<string, any>[]
   isLoading: boolean
 }) => {
-  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear())
+  const [selectedYear, setSelectedYear] = useState<number | null>(null)
 
   // Extract available years from data
   const availableYears = useMemo(() => {
@@ -53,23 +53,25 @@ const RescueChartBar = ({
         years.add(year)
       }
     })
-    return Array.from(years).sort((a, b) => a - b) // Sort ascending (oldest first)
+    return Array.from(years).sort((a, b) => b - a) // Sort descending (newest first)
   }, [data])
 
-  // Update selected year when available years change
+  // Always select the newest year when available years change
   useEffect(() => {
-    if (availableYears.length > 0 && !availableYears.includes(selectedYear)) {
-      setSelectedYear(availableYears[0])
+    if (availableYears.length > 0 && selectedYear === null) {
+      setSelectedYear(availableYears[0]) // Select newest year (first in descending order)
     }
   }, [availableYears, selectedYear])
 
   // Filter and transform data by selected year
   const chartData = useMemo(() => {
+    if (selectedYear === null) return []
     return filterAndTransformByYear(data, selectedYear, ['Nổ', 'CNCH'])
   }, [data, selectedYear])
 
   // Filter and transform data for previous year
   const prevYearChartData = useMemo(() => {
+    if (selectedYear === null) return []
     return filterAndTransformByYear(data, selectedYear - 1, ['Nổ', 'CNCH'])
   }, [data, selectedYear])
 
@@ -99,7 +101,7 @@ const RescueChartBar = ({
           <CardTitle>Số vụ nổ, vụ CNCH</CardTitle>
           <div className="grow"></div>
           <Select
-            value={selectedYear.toString()}
+            value={selectedYear?.toString() ?? ''}
             onValueChange={value => setSelectedYear(Number(value))}
           >
             <SelectTrigger className="text-muted-foreground h-2! border-none! px-0 text-sm font-medium shadow-none">
@@ -204,7 +206,8 @@ const RescueChartBar = ({
         ) : (
           <CardDescription className="text-muted-foreground flex items-center text-xs whitespace-pre">
             <span>
-              So với <span className="font-semibold">{selectedYear - 1}</span>:{' '}
+              So với <span className="font-semibold">{selectedYear ? selectedYear - 1 : ''}</span>
+              :{' '}
             </span>
             {prevYearChartData.length === 0 ? (
               <span>không có dữ liệu</span>
