@@ -30,7 +30,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>{umamiId && <script defer src="/scripts.js" data-website-id={umamiId} />}</head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange={false}
+        >
           {children}
         </ThemeProvider>
       </body>
