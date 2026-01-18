@@ -16,16 +16,13 @@ type LessonViewerProps = {
 }
 
 export const LessonViewer = ({ title, sections, videoUrl }: LessonViewerProps) => {
-  // Sections are already sorted by order from the hook
-  const sortedSections = [...sections].sort((a, b) => a.order - b.order)
-
   return (
     <Card className="bg-card flex-1 rounded-lg border px-6 shadow-none">
       <CardTitle className="items-center text-lg">{title}</CardTitle>
       <div className="flex h-full flex-1 flex-col gap-6 md:flex-row">
         <div className="flex basis-2/5 flex-col">
           <Accordion type="single" defaultValue="item-1" collapsible className="w-full">
-            {sortedSections.map((section, index) => (
+            {sections.map((section, index) => (
               <AccordionItem key={`${section.title}-${index}`} value={`item-${index + 1}`}>
                 <AccordionTrigger className="text-md leading-none font-semibold">
                   {section.title}

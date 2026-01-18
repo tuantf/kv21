@@ -60,7 +60,7 @@ export default function Page() {
     }
 
     try {
-      toast.loading('Đang lưu URL...')
+      toast.loading('Đang lưu URL…')
       const result = await updateBaoCaoNgaySettings(urlInput.trim())
 
       if (result.success) {
@@ -72,9 +72,10 @@ export default function Page() {
         toast.dismiss()
         toast.error(result.message)
       }
-    } catch (error: any) {
+    } catch (error) {
       toast.dismiss()
-      toast.error(error.message || 'Thêm URL thất bại')
+      const message = error instanceof Error ? error.message : 'Thêm URL thất bại'
+      toast.error(message)
     }
   }
 
@@ -84,6 +85,7 @@ export default function Page() {
       size="icon"
       onClick={handleOpenDialog}
       className="hover:bg-ring/20 size-7"
+      aria-label="Cài đặt Google Form"
     >
       <Settings className="h-4 w-4" />
     </Button>
@@ -99,7 +101,7 @@ export default function Page() {
           </div>
         ) : iframeUrl ? (
           <div className="h-full w-full border-none dark:brightness-100 dark:hue-rotate-180 dark:invert dark:saturate-100">
-            <iframe className="h-full w-full border-none" src={iframeUrl} />
+            <iframe className="h-full w-full border-none" src={iframeUrl} title="Báo cáo ngày" />
           </div>
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-4 rounded-lg border border-dashed p-8">
@@ -114,12 +116,12 @@ export default function Page() {
               <h3 className="text-lg font-semibold">Chưa cài đặt Google Form</h3>
               <p className="text-muted-foreground mt-2 text-sm">
                 Hãy nhấn{' '}
-                <span
+                <button
                   onClick={handleOpenDialog}
                   className="hover:text-signature-blue/80 cursor-pointer font-semibold underline"
                 >
                   vào đây
-                </span>{' '}
+                </button>{' '}
                 để thêm Google Form
               </p>
               <p className="text-muted-foreground mt-2 text-sm">

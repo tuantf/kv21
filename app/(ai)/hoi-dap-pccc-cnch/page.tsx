@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Ask } from './_components/ask'
 
 const query = { hoidap: {} }
@@ -36,10 +36,16 @@ export default function Page() {
 
   const { data, isLoading, error } = db.useQuery(query)
 
-  const TCQCUrl = data?.hoidap?.find(item => item.name === 'tcqc')?.link
-  const quyTrinhUrl = data?.hoidap?.find(item => item.name === 'quytrinh')?.link
-  const tuyenTruyenUrl = data?.hoidap?.find(item => item.name === 'tuyentruyen')?.link
-  const baoCaoUrl = data?.hoidap?.find(item => item.name === 'baocao')?.link
+  // Optimized: Single pass through array instead of 4 separate finds
+  const urls = useMemo(() => {
+    const map = new Map(data?.hoidap?.map(item => [item.name, item.link]) || [])
+    return {
+      tcqc: map.get('tcqc') || '',
+      quytrinh: map.get('quytrinh') || '',
+      tuyentruyen: map.get('tuyentruyen') || '',
+      baocao: map.get('baocao') || '',
+    }
+  }, [data])
 
   useEffect(() => {
     if (error) {
@@ -61,12 +67,12 @@ export default function Page() {
   }
 
   const handleOpenDialog = () => {
-    setTCQCUrlInput(TCQCUrl || '')
-    setQuyTrinhUrlInput(quyTrinhUrl || '')
+    setTCQCUrlInput(urls.tcqc)
+    setQuyTrinhUrlInput(urls.quytrinh)
     setTCQCUrlError('')
     setQuyTrinhUrlError('')
-    setTuyenTruyenUrlInput(tuyenTruyenUrl || '')
-    setBaoCaoUrlInput(baoCaoUrl || '')
+    setTuyenTruyenUrlInput(urls.tuyentruyen)
+    setBaoCaoUrlInput(urls.baocao)
     setTuyenTruyenUrlError('')
     setBaoCaoUrlError('')
     setDialogOpen(true)
@@ -120,6 +126,7 @@ export default function Page() {
       size="icon"
       onClick={handleOpenDialog}
       className="hover:bg-ring/20 size-7"
+      aria-label="Cài đặt URL NotebookLM"
     >
       <Settings className="h-4 w-4" />
     </Button>
@@ -153,7 +160,7 @@ export default function Page() {
                 ]}
                 buttonText="Đi đến NotebookLM"
                 buttonColorClass="bg-signature-orange/80! hover:bg-signature-orange/95!"
-                url={TCQCUrl || ''}
+                url={urls.tcqc}
                 imageSrc="/ai/ai_screen_1.avif"
                 imageAlt="Giao diện hỏi đáp quy chuẩn PCCC"
               />
@@ -171,7 +178,7 @@ export default function Page() {
                 ]}
                 buttonText="Đi đến NotebookLM"
                 buttonColorClass="bg-signature-blue/80! hover:bg-signature-blue/95!"
-                url={quyTrinhUrl || ''}
+                url={urls.quytrinh}
                 imageSrc="/ai/ai_screen_2.avif"
                 imageAlt="Giao diện hỏi đáp quy trình công tác"
               />
@@ -187,7 +194,7 @@ export default function Page() {
                 ]}
                 buttonText="Đi đến NotebookLM"
                 buttonColorClass="bg-signature-orange/80! hover:bg-signature-orange/95!"
-                url={tuyenTruyenUrl || ''}
+                url={urls.tuyentruyen}
                 preview={false}
               />
               <Ask
@@ -200,7 +207,7 @@ export default function Page() {
                 ]}
                 buttonText="Đi đến NotebookLM"
                 buttonColorClass="bg-signature-blue/80! hover:bg-signature-blue/95!"
-                url={baoCaoUrl || ''}
+                url={urls.baocao}
                 preview={false}
               />
             </div>

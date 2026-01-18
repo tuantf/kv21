@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { ChevronLeft, ChevronRight, Pencil } from 'lucide-react'
 import { Header } from '@/components/header'
 import { ButtonGroup } from '@/components/ui/button-group'
@@ -41,15 +41,19 @@ export default function Page() {
 
   const { course, lessons } = data
 
-  const manageButton = (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="hover:bg-ring/20 size-7"
-      onClick={() => router.push(`/quan-ly-bai-hoc`)}
-    >
-      <Pencil className="h-4 w-4" />
-    </Button>
+  const manageButton = useMemo(
+    () => (
+      <Button
+        variant="ghost"
+        size="icon"
+        className="hover:bg-ring/20 size-7"
+        onClick={() => router.push(`/quan-ly-bai-hoc`)}
+        aria-label="Quản lý bài học"
+      >
+        <Pencil className="h-4 w-4" />
+      </Button>
+    ),
+    [router],
   )
 
   if (lessons.length === 0) {
@@ -78,6 +82,7 @@ export default function Page() {
                 className="hover:text-signature-orange/80"
                 onClick={() => setCurrentIndex(i => i - 1)}
                 disabled={currentIndex === 0}
+                aria-label="Bài học trước"
               >
                 <ChevronLeft />
               </Button>
@@ -95,6 +100,7 @@ export default function Page() {
                 className="hover:text-signature-blue/80"
                 onClick={() => setCurrentIndex(i => i + 1)}
                 disabled={currentIndex === lessons.length - 1}
+                aria-label="Bài học tiếp theo"
               >
                 <ChevronRight />
               </Button>

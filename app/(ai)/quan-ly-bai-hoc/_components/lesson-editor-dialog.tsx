@@ -256,6 +256,7 @@ export function LessonEditorDialog({
                   placeholder="1"
                   min="0"
                   disabled={!!lesson}
+                  title={lesson ? 'Không thể thay đổi thứ tự khi chỉnh sửa bài học' : undefined}
                 />
               </div>
             </div>

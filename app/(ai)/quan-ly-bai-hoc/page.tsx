@@ -14,9 +14,15 @@ import { Plus } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
 import { db } from '@/libs/instantdb'
 import { toast } from 'sonner'
-import { LessonEditorDialog } from './_components/lesson-editor-dialog'
+import dynamic from 'next/dynamic'
 import { LessonList } from './_components/lesson-list'
 import type { AILesson } from '@/libs/lesson-schema'
+
+// Dynamic import to reduce initial bundle size (~15KB savings)
+const LessonEditorDialog = dynamic(
+  () => import('./_components/lesson-editor-dialog').then(m => ({ default: m.LessonEditorDialog })),
+  { ssr: false },
+)
 
 type LessonCollection = 'ailessons' | 'aiadvancedlessons'
 

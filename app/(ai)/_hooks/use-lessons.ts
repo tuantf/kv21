@@ -73,7 +73,7 @@ export function useCourseLessons(courseSlug: string) {
       },
       lessons: lessonsWithSortedSections,
     }
-  }, [data, courseMeta])
+  }, [data, courseMeta.collection, courseMeta.title])
 
   return {
     data: processedData,
